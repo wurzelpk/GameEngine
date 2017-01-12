@@ -17,7 +17,6 @@ import com.thekeirs.gameengine.system.Sprite;
 public class FrogSprite extends Sprite {
     final private static String TAG = "FrogSprite";
 
-
     public FrogSprite(String name, float x, float y, float width, float height) {
         super(name, x, y, width, height);
         loadImage(R.drawable.frog);
