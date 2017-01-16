@@ -16,14 +16,26 @@ import com.thekeirs.gameengine.system.Sprite;
 
 public class FrogSprite extends Sprite {
     final private static String TAG = "FrogSprite";
+    final private static int TAPS_BEFORE_BECOMING_PRINCE = 7;
+    private int timesTapped;
+    private float targetX, targetY;
 
     public FrogSprite(String name, float x, float y, float width, float height) {
         super(name, x, y, width, height);
         loadImage(R.drawable.frog);
     }
 
+    public void setTargetLocation(float x, float y) {
+        targetX = x;
+        targetY = y;
+    }
+
+    // The update() routine is called once every time the screen is redrawn, generally
+    // 60 times per second.
     @Override
-    public void update() {
+    public void update(int msec) {
+        super.update(msec);
+
         if (!imageLoaded()) {
             return;
         }
@@ -31,7 +43,7 @@ public class FrogSprite extends Sprite {
         // The "f" in "2.0f" means it's a floating point number.
         if (Rand.onceEvery(2.0f)) {
             // Choose random distance and angle to hop.
-            int dist = Rand.between(30, 50);
+            int dist = Rand.between(50, 100);
             float direction = (float) Math.toRadians(Rand.between(0, 360));
             // Move the sprite in the desired direction
             hop(dist, direction);
@@ -51,15 +63,21 @@ public class FrogSprite extends Sprite {
         } else if (boundingRect.bottom > manager.mWorldScreenHeight) {
             boundingRect.offset(0, manager.mWorldScreenHeight - boundingRect.bottom);
         }
+        return;
     }
 
     @Override
     public void onTouch(float x, float y) {
+        ++timesTapped;
+        if (timesTapped == TAPS_BEFORE_BECOMING_PRINCE) {
+            loadImage(R.raw.prince_headshot);
+        }
+
         // Pick a random distance to hop when tapped.
         int dist = Rand.between(30, 50);
 
         // When tapped, always hop exactly towards the middle of the screen.
-        hopToward(dist, manager.mWorldScreenWidth / 2.0f, manager.mWorldScreenHeight / 2.0f);
+        hopToward(dist, targetX, targetY);
 
         // And make a suitable frog noise.
         Audio.play(R.raw.frog_croak);

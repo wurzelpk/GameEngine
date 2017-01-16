@@ -12,6 +12,9 @@ abstract public class GameObject {
     public String name;
     protected GameObjectManager manager;
     public RectF boundingRect;
+    private long mMaxTimeOnScreen;
+    protected long mTimeOnScreen;
+    private boolean mRemovalRequested;
 
     public GameObject(String name, RectF extent) {
         this.name = name;
@@ -20,13 +23,24 @@ abstract public class GameObject {
 
     public void setManager(GameObjectManager manager) {
         this.manager = manager;
-
     }
 
-    public void update() {
+    public void update(int msec) {
+        mTimeOnScreen += msec;
+        if (mMaxTimeOnScreen > 0 && mTimeOnScreen > mMaxTimeOnScreen) {
+            requestRemoval();
+        }
     }
 
     public void onTouch(float x, float y) {
+    }
+
+    public void setMaxTimeOnScreen(int msec) {
+        mMaxTimeOnScreen = msec;
+    }
+
+    public long getTimeOnScreen() {
+        return mTimeOnScreen;
     }
 
     abstract public void draw(Canvas c, float xScale, float yScale);
@@ -50,5 +64,22 @@ abstract public class GameObject {
         } else {
             boundingRect.offsetTo(destx, desty);
         }
+    }
+
+    final public boolean isInside(GameObject other) {
+        return other.boundingRect.contains(boundingRect);
+    }
+
+    final public boolean intersects(GameObject other) {
+        return RectF.intersects(other.boundingRect, boundingRect);
+    }
+
+
+    final public void requestRemoval() {
+        mRemovalRequested = true;
+    }
+
+    final public boolean removalRequested() {
+        return mRemovalRequested;
     }
 }

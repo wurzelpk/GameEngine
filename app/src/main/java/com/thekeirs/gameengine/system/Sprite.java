@@ -34,8 +34,9 @@ public class Sprite extends GameObject {
         return mImage != null;
     }
 
-    public void update() {
-
+    @Override
+    public void update(int msec) {
+        super.update(msec);
     }
 
     public void draw(Canvas c, float xScale, float yScale) {

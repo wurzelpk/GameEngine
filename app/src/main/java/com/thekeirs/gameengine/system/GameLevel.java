@@ -17,6 +17,16 @@ abstract public class GameLevel {
     public void setup() {
     }
 
+    public void update() {
+    }
+
+    public boolean onAnyTouch(float x, float y) {
+        return false;
+    }
+
+    public void onUnclaimedTouch(float x, float y) {
+    }
+
     public void finish() {
     }
 }

@@ -5,7 +5,10 @@ import android.graphics.Canvas;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,6 +66,16 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         return mObjects.get(name);
     }
 
+    public List<GameObject> getObjectsMatching(String prefix) {
+        List<GameObject> objects = new ArrayList<>();
+
+        for (GameObject obj : mObjects.values()) {
+            if (obj.name.startsWith(prefix)) {
+                objects.add(obj);
+            }
+        }
+        return objects;
+    }
 
     public void setScene(Scene scene) {
         this.mScene = scene;
@@ -86,10 +99,14 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
     }
 
     public void checkTouchedObjects(float x, float y) {
-        for (GameObject obj : mObjects.values()) {
-            if (obj.contains(x, y)) {
-                obj.onTouch(x, y);
+        if (!mLevel.onAnyTouch(x, y)) {
+            for (GameObject obj : mObjects.values()) {
+                if (obj.contains(x, y)) {
+                    obj.onTouch(x, y);
+                    return;
+                }
             }
+            mLevel.onUnclaimedTouch(x, y);
         }
     }
 
@@ -126,7 +143,19 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
 
         // Log.d(TAG, "update");
         for (GameObject obj : mObjects.values()) {
-            obj.update();
+            obj.update(16);   // TODO: For now, cheating and assuming 60fps
+        }
+        mLevel.update();
+
+        // Not available until post-Marshmallow (API 24 or later):
+        //     mObjects.entrySet().removeIf(o -> o.getValue().removalRequested());
+        // So, we go old-school and use an iterator.
+        Iterator<GameObject> it = mObjects.values().iterator();
+        while (it.hasNext()) {
+            GameObject obj = it.next();
+            if (obj.removalRequested()) {
+                it.remove();
+            }
         }
     }
 }
