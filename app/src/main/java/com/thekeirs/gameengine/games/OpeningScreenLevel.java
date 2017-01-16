@@ -36,7 +36,7 @@ public class OpeningScreenLevel extends GameLevel {
                         R.raw.button_frogger) {
                     @Override
                     public void onTouch(float x, float y) {
-                        mManager.setLevel(new FrogHerderLevel());
+                        mManager.setLevel(new FroggerLevel());
                     }
                 }
         );

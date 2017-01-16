@@ -27,6 +27,16 @@ abstract public class GameLevel {
     public void onUnclaimedTouch(float x, float y) {
     }
 
+    public boolean onAnyFling(float x, float y, float dx, float dy) {
+        return false;
+    }
+
+    public void onUnclaimedFling(float x, float y, float dx, float dy) {
+    }
+
+    public void onUnclaimedScroll(float x, float y, float dx, float dy, boolean finished) {
+    }
+
     public void finish() {
     }
 }

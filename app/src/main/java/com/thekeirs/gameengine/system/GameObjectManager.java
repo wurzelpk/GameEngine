@@ -98,7 +98,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         }
     }
 
-    public void checkTouchedObjects(float x, float y) {
+    private void checkTouchedObjects(float x, float y) {
         if (!mLevel.onAnyTouch(x, y)) {
             for (GameObject obj : mObjects.values()) {
                 if (obj.contains(x, y)) {
@@ -107,6 +107,47 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
                 }
             }
             mLevel.onUnclaimedTouch(x, y);
+        }
+    }
+
+    private void deliverFling(float x, float y, float dx, float dy) {
+        if (!mLevel.onAnyFling(x, y, dx, dy)) {
+            for (GameObject obj : mObjects.values()) {
+                if (obj.contains(x, y)) {
+                    obj.onFling(x, y, dx, dy);
+                    return;
+                }
+            }
+            mLevel.onUnclaimedFling(x, y, dx, dy);
+        }
+    }
+
+    private void deliverScroll(float x, float y, float dx, float dy, boolean finished) {
+        // To deliver these to specific objects will take a bit more complicated tracking
+        // of which object the scroll started on.  For now, just implement the simple one until
+        // there's a real need for the more complicated.
+        mLevel.onUnclaimedScroll(x, y, dx, dy, finished);
+    }
+
+    @Override
+    public void onMotionEvent(GameView.UIEvent e) {
+        // We receive the event with coordinates normalized 0.0-1.0f.  Scale to our world coords.
+        float x = e.event1.getX() * mWorldScreenWidth;
+        float y = e.event1.getY() * mWorldScreenHeight;
+        switch (e.type) {
+            case Down:
+                Log.d(TAG, "Event ACTION_DOWN at " + x + "," + y);
+                checkTouchedObjects(x, y);
+                break;
+            case Fling:
+                deliverFling(x, y, e.dx * mWorldScreenWidth, e.dy * mWorldScreenHeight);
+                break;
+            case Scroll:
+                deliverScroll(x, y, e.dx * mWorldScreenWidth, e.dy * mWorldScreenHeight,
+                        e.event2.getAction() == MotionEvent.ACTION_UP);
+                break;
+            default:
+                break;
         }
     }
 
@@ -124,16 +165,6 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         }
     }
 
-    @Override
-    public void onMotionEvent(MotionEvent e) {
-        // We receive the event with coordinates normalized 0.0-1.0f.  Scale to our world coords.
-        float x = e.getX() * mWorldScreenWidth;
-        float y = e.getY() * mWorldScreenHeight;
-        if (e.getAction() == MotionEvent.ACTION_DOWN) {
-            Log.d(TAG, "Event ACTION_DOWN at " + x + "," + y);
-            checkTouchedObjects(x, y);
-        }
-    }
 
     @Override
     public void update(int millis) {

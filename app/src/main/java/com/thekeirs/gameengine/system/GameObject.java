@@ -35,6 +35,10 @@ abstract public class GameObject {
     public void onTouch(float x, float y) {
     }
 
+    public void onFling(float x, float y, float dx, float dy) {
+
+    }
+
     public void setMaxTimeOnScreen(int msec) {
         mMaxTimeOnScreen = msec;
     }
@@ -52,6 +56,10 @@ abstract public class GameObject {
     protected void hop(float distance, float direction) {
         float dx = (float) (distance * Math.cos(direction));
         float dy = (float) (distance * Math.sin(direction));
+        boundingRect.offset(dx, dy);
+    }
+
+    public void moveBy(float dx, float dy) {
         boundingRect.offset(dx, dy);
     }
 

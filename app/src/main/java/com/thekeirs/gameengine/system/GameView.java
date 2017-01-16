@@ -2,8 +2,10 @@ package com.thekeirs.gameengine.system;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,14 +16,14 @@ import android.view.View;
  */
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     final private String TAG = "GameView";
-
+    private GestureDetectorCompat mDetector;
 
     public interface IRedrawService {
         void draw(Canvas canvas);
     }
 
     public interface IGameLogicService extends IMessageClient {
-        void onMotionEvent(MotionEvent e);
+        void onMotionEvent(UIEvent e);
         void update(int millis);
     }
 
@@ -46,11 +48,46 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
         getHolder().addCallback(this);
+
+        mDetector = new GestureDetectorCompat(context, new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                mGameViewThread.queueEvent(new UIEvent(UIEventType.Down, e));
+                return true;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+                mGameViewThread.queueEvent(new UIEvent(UIEventType.ShowPress, e));
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                mGameViewThread.queueEvent(new UIEvent(UIEventType.SingleTapUp, e));
+                return true;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                mGameViewThread.queueEvent(new UIEvent(UIEventType.Scroll, e1, e2, distanceX, distanceY));
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                mGameViewThread.queueEvent(new UIEvent(UIEventType.LongPress, e));
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                mGameViewThread.queueEvent(new UIEvent(UIEventType.Fling, e1, e2, velocityX, velocityY));
+                return true;
+            }
+        });
         this.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                // TODO: Change to applyTransform or something like that
-                mGameViewThread.queueEvent(event);
+                mDetector.onTouchEvent(event);
                 return true;
             }
         });
@@ -100,6 +137,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         if (mGameViewThread != null) {
             mGameViewThread.gracefulStop();
         }
+    }
+
+    public enum UIEventType {
+        Down, ShowPress, SingleTapUp, Scroll, LongPress, Fling
+    }
+
+    public class UIEvent {
+        UIEvent(UIEventType type, MotionEvent event1) {
+            this.type = type;
+            this.event1 = event1;
+        }
+
+        UIEvent(UIEventType type, MotionEvent event1, MotionEvent event2, float dx, float dy) {
+            this.type = type;
+            this.event1 = event1;
+            this.event2 = event2;
+            this.dx = dx;
+            this.dy = dy;
+        }
+
+        UIEventType type;
+        public MotionEvent event1, event2;
+        public float dx, dy;        // Holds Velocity for flings, distance for scrolls
     }
 }
 

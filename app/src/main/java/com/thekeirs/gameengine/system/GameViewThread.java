@@ -2,7 +2,6 @@ package com.thekeirs.gameengine.system;
 
 import android.graphics.Canvas;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import java.util.concurrent.BlockingQueue;
@@ -17,7 +16,7 @@ public class GameViewThread extends Thread {
     private GameView.IGameLogicService mGameLogic;
     private GameView.IRedrawService mRedrawService;
     private SurfaceHolder mHolder;
-    BlockingQueue<MotionEvent> mEvents = new LinkedBlockingQueue<>();
+    BlockingQueue<GameView.UIEvent> mEvents = new LinkedBlockingQueue<>();
     private float mXFactor = 1.0f, mYFactor = 1.0f;
 
     public GameViewThread(SurfaceHolder holder, GameView.IGameLogicService gameLogic, GameView.IRedrawService redrawService) {
@@ -31,7 +30,7 @@ public class GameViewThread extends Thread {
         mYFactor = yfactor;
     }
 
-    public void queueEvent(MotionEvent e) {
+    public void queueEvent(GameView.UIEvent e) {
         mEvents.add(e);
     }
 
@@ -44,10 +43,15 @@ public class GameViewThread extends Thread {
             if (c == null) {
                 Log.d(TAG, "null canvas from mHolder");
             } else {
-                MotionEvent e;
+                GameView.UIEvent e;
 
                 while ((e = mEvents.poll()) != null) {
-                    e.setLocation(e.getX() * mXFactor, e.getY() * mYFactor);
+                    e.event1.setLocation(e.event1.getX() * mXFactor, e.event1.getY() * mYFactor);
+                    if (e.event2 != null) {
+                        e.event2.setLocation(e.event2.getX() * mXFactor, e.event2.getY() * mYFactor);
+                        e.dx *= mXFactor;
+                        e.dy *= mYFactor;
+                    }
                     mGameLogic.onMotionEvent(e);
                 }
                 mGameLogic.update(30);  // TODO: actual frame timing
