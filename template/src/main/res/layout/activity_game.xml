@@ -4,7 +4,7 @@
     android:id="@+id/activity_game"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.thekeirs.games.samples.GameActivity">
+    tools:context="com.thekeirs.games.template.GameActivity">
 
     <com.thekeirs.games.engine.GameView
         android:layout_width="match_parent"

@@ -1,1 +1,1 @@
-include ':app', ':engine'
+include ':app', ':engine', ':template'
