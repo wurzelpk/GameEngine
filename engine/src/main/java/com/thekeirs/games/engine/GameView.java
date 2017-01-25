@@ -12,11 +12,19 @@ import android.view.SurfaceView;
 import android.view.View;
 
 /**
- * Provides a surface for various tests to write to from background thread
+ * <h1>[internal] Android User Interface widget that provides the space for the game to draw on</h1>
+ * <p>
+ *     This widget is responsible for starting and stopping the game's background
+ *     worker thread when the view is visible and active, and for receiving, packaging up, and
+ *     queueing UI events for the worker thread.
+ * </p>
  */
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     final private String TAG = "GameView";
     private GestureDetectorCompat mDetector;
+    private IRedrawService mRedrawService;
+    private IGameLogicService mGameLogicService;
+    private GameViewThread mGameViewThread;
 
     public interface IRedrawService {
         void draw(Canvas canvas);
@@ -26,10 +34,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         void onMotionEvent(UIEvent e);
         void update(int millis);
     }
-
-    private IRedrawService mRedrawService;
-    private IGameLogicService mGameLogicService;
-    private GameViewThread mGameViewThread;
 
     public GameView(Context context) {
         super(context);
@@ -107,7 +111,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void onPause() {
-
+        if (mGameViewThread != null) {
+            mGameViewThread.gracefulStop();
+            mGameViewThread = null;
+        }
     }
 
     @Override
@@ -119,6 +126,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         if (mGameViewThread != null) {
             mGameViewThread.gracefulStop();
+            mGameViewThread = null;
         }
         if (holder != null) {
             Log.d(TAG, "surfaceChanged, launching thread");
@@ -136,6 +144,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder holder) {
         if (mGameViewThread != null) {
             mGameViewThread.gracefulStop();
+            mGameViewThread = null;
         }
     }
 

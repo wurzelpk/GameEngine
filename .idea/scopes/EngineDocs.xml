@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="EngineDocs" pattern="(src[engine]:com.thekeirs.games.engine..*||src[app]:com.thekeirs.games.engine.*)&amp;&amp;!src[app]:com.thekeirs.games.engine.R" />
+</component>

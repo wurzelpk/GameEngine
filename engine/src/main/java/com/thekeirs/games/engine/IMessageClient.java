@@ -1,9 +1,9 @@
 package com.thekeirs.games.engine;
 
 /**
- * Created by wurzel on 12/30/16.
+ * <h1>[internal] Interface for clients who want to receive messages from the MessageBus</h1>
  */
 
 public interface IMessageClient {
-    public void handleMessage(Message msg);
+    void handleMessage(Message msg);
 }

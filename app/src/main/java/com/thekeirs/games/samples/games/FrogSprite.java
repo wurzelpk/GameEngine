@@ -1,13 +1,11 @@
 package com.thekeirs.games.samples.games;
 
-import com.thekeirs.games.samples.R;
-import com.thekeirs.games.engine.Rand;
 import com.thekeirs.games.engine.Audio;
+import com.thekeirs.games.engine.Rand;
 import com.thekeirs.games.engine.Sprite;
+import com.thekeirs.games.samples.R;
 
 /**
- * Created by wurzel on 2016-Dec-20
- *
  * This class uses Sprite (which draws an image on the screen at a requested location)
  * and adds two additional behaviors:
  *    in update() the frog may randomly hop around every once in a while
@@ -36,15 +34,12 @@ public class FrogSprite extends Sprite {
     public void update(int msec) {
         super.update(msec);
 
-        if (!imageLoaded()) {
-            return;
-        }
         // onceEvery(N) does something randomly approximately every N seconds.
         // The "f" in "2.0f" means it's a floating point number.
         if (Rand.onceEvery(2.0f)) {
             // Choose random distance and angle to hop.
             int dist = Rand.between(50, 100);
-            float direction = (float) Math.toRadians(Rand.between(0, 360));
+            float direction = (float) Rand.between(0, 360);
             // Move the sprite in the desired direction
             hop(dist, direction);
         }
@@ -54,14 +49,14 @@ public class FrogSprite extends Sprite {
         // forces them back inside.
         if (boundingRect.left < 0) {
             boundingRect.offsetTo(0, boundingRect.top);
-        } else if (boundingRect.right > manager.mWorldScreenWidth) {
-            boundingRect.offset(manager.mWorldScreenWidth - boundingRect.right, 0);
+        } else if (boundingRect.right > manager.getWorldScreenWidth()) {
+            boundingRect.offset(manager.getWorldScreenWidth() - boundingRect.right, 0);
         }
 
         if (boundingRect.top < 0) {
             boundingRect.offsetTo(boundingRect.left, 0);
-        } else if (boundingRect.bottom > manager.mWorldScreenHeight) {
-            boundingRect.offset(0, manager.mWorldScreenHeight - boundingRect.bottom);
+        } else if (boundingRect.bottom > manager.getWorldScreenHeight()) {
+            boundingRect.offset(0, manager.getWorldScreenHeight() - boundingRect.bottom);
         }
         return;
     }

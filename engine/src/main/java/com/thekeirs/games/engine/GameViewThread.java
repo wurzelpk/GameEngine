@@ -8,7 +8,19 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by wurzel on 1/8/17.
+ * <h1>[internal] This is the thread where all update() and draw() calls are done for every game
+ * object</h1>
+ *
+ * <p>
+ *     It is prohibited to run CPU-intensive work on the UI Thread in Android, so we launch
+ *     this separate thread whenever the UI is ready, and take it down any time the UI becomes
+ *     un-ready.
+ * </p>
+ * <p>
+ *     The main Game Activity for the app is responsible for configuring this thread with
+ *     a {@link GameView.IGameLogicService} and {@link GameView.IRedrawService} to pass along
+ *     the actual update() and draw() calls.
+ *  </p>
  */
 
 public class GameViewThread extends Thread {
@@ -16,7 +28,7 @@ public class GameViewThread extends Thread {
     private GameView.IGameLogicService mGameLogic;
     private GameView.IRedrawService mRedrawService;
     private SurfaceHolder mHolder;
-    BlockingQueue<GameView.UIEvent> mEvents = new LinkedBlockingQueue<>();
+    private BlockingQueue<GameView.UIEvent> mEvents = new LinkedBlockingQueue<>();
     private float mXFactor = 1.0f, mYFactor = 1.0f;
 
     public GameViewThread(SurfaceHolder holder, GameView.IGameLogicService gameLogic, GameView.IRedrawService redrawService) {
@@ -25,11 +37,15 @@ public class GameViewThread extends Thread {
         mRedrawService = redrawService;
     }
 
+    /**
+     * Set factors to normalize user input event coordinates into range 0.0-1.0
+     */
     public void setEventScalingFactors(float xfactor, float yfactor) {
         mXFactor = xfactor;
         mYFactor = yfactor;
     }
 
+    /** UI Events arrive on the UI thread and must be handed off to the worker thread */
     public void queueEvent(GameView.UIEvent e) {
         mEvents.add(e);
     }
@@ -54,7 +70,7 @@ public class GameViewThread extends Thread {
                     }
                     mGameLogic.onMotionEvent(e);
                 }
-                mGameLogic.update(30);  // TODO: actual frame timing
+                mGameLogic.update(16);  // TODO: actual frame timing
                 mRedrawService.draw(c);
                 mHolder.unlockCanvasAndPost(c);
                 ++loops;

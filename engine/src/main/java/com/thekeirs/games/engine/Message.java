@@ -1,7 +1,8 @@
 package com.thekeirs.games.engine;
 
 /**
- * Created by wurzel on 12/30/16.
+ * <h1>[internal] Used to encapsulate a message to be send on the {@link MessageBus}.
+ * Not currently used.</h1>
  */
 
 public class Message {

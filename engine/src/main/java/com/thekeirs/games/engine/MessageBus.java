@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by wurzel on 12/30/16.
+ * <h1>[internal] Originally the MessageBus was a central part of the game engine's design, but
+ * it hasn't proven terribly useful and may be going away.</h1>
  */
 
 public final class MessageBus {
