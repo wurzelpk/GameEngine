@@ -180,6 +180,26 @@ abstract public class GameObject {
     }
 
     /**
+     * Instantly move the game object so its center is at the given coordinates.
+     *
+     * @param x horizontal coordinate of the destination in world units
+     * @param y vertical coordinate of the destination in world units
+     */
+    public void setCenterXY(float x, float y) {
+        boundingRect.offset(x - boundingRect.centerX(), y - boundingRect.centerY());
+    }
+
+    /**
+     * Instantly move the game object so its upper left is at the given coordinates.
+     *
+     * @param x horizontal coordinate of the destination in world units
+     * @param y vertical coordinate of the destination in world units
+     */
+    public void setUpperLeftXY(float x, float y) {
+        boundingRect.offset(x - boundingRect.left, y - boundingRect.top);
+    }
+
+    /**
      * Checks if this game object's bounding rectangle is entirely inside of another object.
      *
      * @param other the game object to test if this object is inside of.
