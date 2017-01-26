@@ -2,6 +2,7 @@ package com.thekeirs.games.engine;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
@@ -332,6 +333,14 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
                 it.remove();
             }
         }
+    }
+
+    /**
+     * Returns a rectangle (RectF) that can be used to check if something is on or off the screen
+     * in world coordinates.
+     */
+    public RectF getWorldBoundary() {
+        return new RectF(0, 0, mWorldScreenWidth, mWorldScreenHeight);
     }
 
     /**

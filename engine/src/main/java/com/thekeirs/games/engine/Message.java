@@ -1,7 +1,7 @@
 package com.thekeirs.games.engine;
 
 /**
- * <h1>[internal] Used to encapsulate a message to be send on the {@link MessageBus}.
+ * <h1>[internal] Used to encapsulate a message to be sent on the {@link MessageBus}.
  * Not currently used.</h1>
  */
 
