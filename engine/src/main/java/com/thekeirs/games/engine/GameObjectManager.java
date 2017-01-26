@@ -339,9 +339,32 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
      * Returns a rectangle (RectF) that can be used to check if something is on or off the screen
      * in world coordinates.
      */
-    public RectF getWorldBoundary() {
+    private RectF getWorldBoundary() {
         return new RectF(0, 0, mWorldScreenWidth, mWorldScreenHeight);
     }
+
+    /**
+     * Returns true if the game object is entirely within the boundaries of the screen at
+     * the object's current location.
+     *
+     * @param obj the game object to check for on-screen-ness
+     * @return {@code true} if the object is entirely on-screen
+     */
+    public boolean isFullyOnScreen(GameObject obj) {
+        return getWorldBoundary().contains(obj.boundingRect);
+    }
+
+    /**
+     * Returns true if the object is entirely outside the boundaries of the screen
+     * at the object's current location.
+     *
+     * @param obj the game object to check for off-screen-ness
+     * @return {@code true} if the object is entirely off-screen
+     */
+    public boolean isFullyOffScreen(GameObject obj) {
+        return !RectF.intersects(obj.boundingRect, getWorldBoundary());
+    }
+
 
     /**
      * Get the currently-configured world width in world units

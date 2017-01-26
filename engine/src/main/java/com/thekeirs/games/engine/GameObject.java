@@ -200,6 +200,27 @@ abstract public class GameObject {
     }
 
     /**
+     * Returns true if this game object is entirely within the boundaries of the screen at
+     * the object's current location.
+     *
+     * @return {@code true} if the object is entirely on-screen
+     */
+    public boolean isFullyOnScreen() {
+        return manager.isFullyOnScreen(this);
+    }
+
+    /**
+     * Returns true if this object is entirely outside the boundaries of the screen
+     * at the object's current location.
+     *
+     * @return {@code true} if the object is entirely off-screen
+     */
+    public boolean isFullyOffScreen() {
+        return manager.isFullyOffScreen(this);
+    }
+
+
+    /**
      * Request that the game object manager remove this sprite after this update loop is complete.
      */
     final public void requestRemoval() {
