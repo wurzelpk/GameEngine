@@ -1,12 +1,12 @@
 package com.thekeirs.games.samples.games;
 
-import com.thekeirs.games.samples.R;
-import com.thekeirs.games.engine.Rand;
 import com.thekeirs.games.engine.GameLevel;
 import com.thekeirs.games.engine.GameObject;
+import com.thekeirs.games.engine.Rand;
 import com.thekeirs.games.engine.Scene;
 import com.thekeirs.games.engine.SolidColorScene;
 import com.thekeirs.games.engine.Sprite;
+import com.thekeirs.games.samples.R;
 
 /**
  * Created by wurzel on 1/6/17.
@@ -79,7 +79,7 @@ public class FrogHerderLevel extends GameLevel {
     }
 
     @Override
-    public void update() {
+    public void update(int millis) {
         // Use a loop to count how many frogs are not touching the lillypad right now
         int frogsOffPad = 0;
         for (GameObject frog : mManager.getObjectsMatching("frog")) {

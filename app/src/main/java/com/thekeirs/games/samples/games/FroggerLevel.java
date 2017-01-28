@@ -1,10 +1,10 @@
 package com.thekeirs.games.samples.games;
 
-import com.thekeirs.games.samples.R;
 import com.thekeirs.games.engine.GameLevel;
 import com.thekeirs.games.engine.Scene;
 import com.thekeirs.games.engine.SolidColorScene;
 import com.thekeirs.games.engine.Sprite;
+import com.thekeirs.games.samples.R;
 
 import static java.lang.Math.abs;
 
@@ -70,7 +70,7 @@ public class FroggerLevel extends GameLevel {
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void update(int millis) {
+        super.update(millis);
     }
 }

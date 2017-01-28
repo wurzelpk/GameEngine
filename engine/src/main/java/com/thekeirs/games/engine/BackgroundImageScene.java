@@ -1,7 +1,6 @@
 package com.thekeirs.games.engine;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
@@ -43,7 +42,7 @@ public class BackgroundImageScene extends Scene {
      * @param id resource ID of the image (eg {@code R.raw.background_level2})
      */
     public void setImage(int id) {
-        mImage = BitmapFactory.decodeResource(mManager.getResources(), id);
+        mImage = Images.get(id);
     }
 
     /**

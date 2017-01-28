@@ -1,7 +1,6 @@
 package com.thekeirs.games.engine;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -123,7 +122,7 @@ public class Sprite extends GameObject {
             return;
         }
         if (mImage == null) {
-            mImage = BitmapFactory.decodeResource(manager.getResources(), mImageId);
+            mImage = Images.get(mImageId);
         }
         // Log.d("gameobject", "Drawing " + name + " at " + x + ", " + y);
 
@@ -131,4 +130,6 @@ public class Sprite extends GameObject {
 
         c.drawBitmap(mImage, new Rect(0, 0, mImage.getWidth(), mImage.getHeight()), screenRect, null);
     }
+
+
 }

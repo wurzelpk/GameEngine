@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.thekeirs.games.engine.Audio;
 import com.thekeirs.games.engine.GameObjectManager;
 import com.thekeirs.games.engine.GameView;
+import com.thekeirs.games.engine.Images;
 import com.thekeirs.games.engine.MessageBus;
 
 public class GameActivity extends AppCompatActivity {
@@ -18,6 +19,8 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        Images.setResources(getResources());
 
         mBus = new MessageBus();
 
