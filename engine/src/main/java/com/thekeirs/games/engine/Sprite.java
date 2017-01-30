@@ -5,6 +5,11 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * <h1>Represents a {@link GameObject} that has an image associated with it, and a
  * location on the screen to draw that image (left x, upper y, width, height).
@@ -21,15 +26,10 @@ import android.graphics.RectF;
  */
 
 public class Sprite extends GameObject {
-    /**
-     * Holds the resource ID (R.drawable.* or R.raw.*) for this sprite's image
-     */
-    protected int mImageId = -1;
-
-    /**
-     * Stores the bitmap image to be displayed by this sprite
-     */
-    protected Bitmap mImage;
+    final static String DEFAULT_STATE_NAME = "default";
+    protected String mMotionState = DEFAULT_STATE_NAME;
+    protected Map<String, MotionSequence> mMotionSequences = new HashMap<>();
+    private long timeInThisMotionState;
 
     /**
      * Returns a Sprite game object with the given name and location/size on the screen.
@@ -59,7 +59,7 @@ public class Sprite extends GameObject {
      */
     public Sprite(String name, float x, float y, float width, float height, int image_id) {
         super(name, new RectF(x, y, x + width, y + height));
-        loadImage(image_id);
+        setDefaultImage(image_id);
     }
 
     /**
@@ -69,10 +69,20 @@ public class Sprite extends GameObject {
      * @param id the ID of the image to display (eg {@literal R.id.my_sprite})
      */
     public void loadImage(int id) {
-        if (id != mImageId) {
-            mImageId = id;
-            mImage = null;
-        }
+        setDefaultImage(id);
+    }
+
+    public void setDefaultImage(int id) {
+        mMotionSequences.put(DEFAULT_STATE_NAME, new MotionSequence(id));
+    }
+
+    public void setMotionSequence(String motionStateName, int frameDuration, int... ids) {
+        mMotionSequences.put(motionStateName, new MotionSequence(frameDuration, ids));
+    }
+
+    public void setMotionState(String motionState) {
+        mMotionState = motionState;
+        timeInThisMotionState = 0;
     }
 
     /**
@@ -106,6 +116,7 @@ public class Sprite extends GameObject {
     @Override
     public void update(int msec) {
         super.update(msec);
+        timeInThisMotionState += msec;
     }
 
     /**
@@ -117,19 +128,49 @@ public class Sprite extends GameObject {
      * @param yScale  horizontal scale factor between world and screen coordinates
      */
     public void draw(Canvas c, float xScale, float yScale) {
-        if (mImageId < 0) {
-            // No image has been requested, so don't draw anything.
+        MotionSequence ms = mMotionSequences.get(mMotionState);
+        if (ms == null || ms.resourceIds.isEmpty()) {
+            // No image has been requested, or someone put is in a bad state.  Draw nothing.
             return;
         }
-        if (mImage == null) {
-            mImage = Images.get(mImageId);
+
+        // Loop through resourceIDs, spending specified time on each frame.
+        int frameIndex = (int) (timeInThisMotionState / ms.msecPerFrame) % ms.resourceIds.size();
+        int resourceID = ms.resourceIds.get(frameIndex);
+
+        // -1 at end of sequence is a sentinal to go back to default motion state rather than
+        // looping.
+        if (resourceID == -1) {
+            setMotionState(DEFAULT_STATE_NAME);
+            // Call recursively to make sure everything gets checked again.
+            draw(c, xScale, yScale);
+            return;
         }
+        Bitmap image = Images.get(ms.resourceIds.get(frameIndex));
+
         // Log.d("gameobject", "Drawing " + name + " at " + x + ", " + y);
 
         RectF screenRect = new RectF(boundingRect.left * xScale, boundingRect.top * yScale, boundingRect.right * xScale, boundingRect.bottom * yScale);
 
-        c.drawBitmap(mImage, new Rect(0, 0, mImage.getWidth(), mImage.getHeight()), screenRect, null);
+        c.drawBitmap(image, new Rect(0, 0, image.getWidth(), image.getHeight()), screenRect, null);
     }
 
+    private class MotionSequence {
+        public int msecPerFrame;
+        public List<Integer> resourceIds;
 
+        public MotionSequence(int id) {
+            msecPerFrame = Integer.MAX_VALUE;
+            resourceIds = new ArrayList<>();
+            resourceIds.add(id);
+        }
+
+        public MotionSequence(int frameDurationMsec, int[] ids) {
+            msecPerFrame = frameDurationMsec;
+            resourceIds = new ArrayList<>(ids.length);
+            for (int i : ids) {
+                resourceIds.add(i);
+            }
+        }
+    }
 }

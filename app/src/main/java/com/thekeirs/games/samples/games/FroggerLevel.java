@@ -36,6 +36,7 @@ public class FroggerLevel extends GameLevel {
         mManager.setScene(scene);
 
         frog = new Sprite("player1", WIDTH / 2, HEIGHT - 80, 80, 80, R.drawable.frog);
+        frog.setMotionSequence("hopping", 100, R.raw.plain_frog1, R.raw.plain_frog2, -1);
         mManager.addObject(frog);
     }
 
@@ -67,10 +68,16 @@ public class FroggerLevel extends GameLevel {
                 frog.moveBy(0, -HOPSIZE);
             }
         }
+        frog.setMotionState("hopping");
     }
 
     @Override
     public void update(int millis) {
         super.update(millis);
+
+        if (!frog.isFullyOnScreen()) {
+            mYouWonOrLost = new Sprite("won", 100, 100, WIDTH - 100, HEIGHT - 100, R.raw.you_won);
+            mManager.addObject(mYouWonOrLost);
+        }
     }
 }
