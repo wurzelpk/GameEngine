@@ -57,8 +57,10 @@ public class FroggerLevel extends GameLevel {
             // Fling was primarily left/right
             if (dx > 0) {
                 frog.moveBy(HOPSIZE, 0);
+                frog.flipX(true);
             } else {
                 frog.moveBy(-HOPSIZE, 0);
+                frog.flipX(false);
             }
         } else {
             // Fling was primarily up/down
@@ -74,6 +76,8 @@ public class FroggerLevel extends GameLevel {
     @Override
     public void update(int millis) {
         super.update(millis);
+
+        frog.addRotation(1.0f);
 
         if (!frog.isFullyOnScreen()) {
             mYouWonOrLost = new Sprite("won", 100, 100, WIDTH - 100, HEIGHT - 100, R.raw.you_won);

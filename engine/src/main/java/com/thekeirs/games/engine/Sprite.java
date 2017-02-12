@@ -2,7 +2,7 @@ package com.thekeirs.games.engine;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Rect;
+import android.graphics.Matrix;
 import android.graphics.RectF;
 
 import java.util.ArrayList;
@@ -15,8 +15,9 @@ import java.util.Map;
  * location on the screen to draw that image (left x, upper y, width, height).
  *
  * <p>
- *     A Sprite has no behaviors on its own.  Rather than using a Sprite directly, in
- *     most cases you will create a subclass of Sprite that has the behaviors you need.
+ *     A Sprite has no behaviors on its own.  You may choose to use a Sprite directly and
+ *     implement all behavior for the sprite in your GameLevel logic.  Or, rather than using a
+ *     Sprite directly, you may create a subclass of Sprite that has the behaviors you need.
  * </p>
  *
  * <p>
@@ -30,6 +31,10 @@ public class Sprite extends GameObject {
     protected String mMotionState = DEFAULT_STATE_NAME;
     protected Map<String, MotionSequence> mMotionSequences = new HashMap<>();
     private long timeInThisMotionState;
+    private Matrix mMatrix;
+    private boolean mFlipX;
+    private boolean mFlipY;
+    private float mRotation;
 
     /**
      * Returns a Sprite game object with the given name and location/size on the screen.
@@ -146,13 +151,30 @@ public class Sprite extends GameObject {
             draw(c, xScale, yScale);
             return;
         }
-        Bitmap image = Images.get(ms.resourceIds.get(frameIndex));
+        int imageId = ms.resourceIds.get(frameIndex);
+        Bitmap image = Images.get(imageId);
 
         // Log.d("gameobject", "Drawing " + name + " at " + x + ", " + y);
 
-        RectF screenRect = new RectF(boundingRect.left * xScale, boundingRect.top * yScale, boundingRect.right * xScale, boundingRect.bottom * yScale);
+        if (mMatrix == null) {
+            mMatrix = new Matrix();
+        }
+        mMatrix.setTranslate(-image.getWidth() / 2.0f, -image.getHeight() / 2.0f);
+        if (mFlipX) {
+            mMatrix.postScale(-1.0f, 1.0f);
+        }
+        if (mFlipY) {
+            mMatrix.postScale(1.0f, -1.0f);
+        }
+        if (mRotation != 0.0f) {
+            mMatrix.postRotate(mRotation);
+        }
+        mMatrix.postScale(boundingRect.width() * xScale / image.getWidth(), boundingRect.height() * yScale / image.getHeight());
+        mMatrix.postTranslate(boundingRect.centerX() * xScale, boundingRect.centerY() * yScale);
 
-        c.drawBitmap(image, new Rect(0, 0, image.getWidth(), image.getHeight()), screenRect, null);
+        // RectF screenRect = new RectF(boundingRect.left * xScale, boundingRect.top * yScale, boundingRect.right * xScale, boundingRect.bottom * yScale);
+
+        c.drawBitmap(image, mMatrix, null);
     }
 
     private class MotionSequence {
@@ -173,4 +195,50 @@ public class Sprite extends GameObject {
             }
         }
     }
+
+    /**
+     * Flips the sprite image left/right if true.
+     *
+     * @param flip {@code true} to flip, {@code false} to draw as-is
+     */
+    public void flipX(boolean flip) {
+        mFlipX = flip;
+    }
+
+    /**
+     * Flips the sprite image up/down if true.
+     *
+     * @param flip {@code true} to flip, {@code false} to draw as-is
+     */
+    public void flipY(boolean flip) {
+        mFlipY = flip;
+    }
+
+    /**
+     * Rotates the sprite this many degrees
+     *
+     * @param degrees angle to rotate the sprite image by  (clockwise from its default image)
+     */
+    public void setRotation(float degrees) {
+        mRotation = degrees;
+    }
+
+    /**
+     * Rotates the sprite by an additional amount on top of its current rotation
+     *
+     * @param degrees number of additional degrees to rotate the sprite
+     */
+    public void addRotation(float degrees) {
+        mRotation += degrees;
+    }
+
+    /**
+     * Query the rotation angle of the sprite.
+     *
+     * @return number of degrees clockwise the sprite is rotate from its default orientation.
+     */
+    public float getRotation() {
+        return mRotation;
+    }
+
 }
