@@ -42,13 +42,14 @@ public class Sprite extends GameObject {
      * for a Sprite created this way until {@link #loadImage} is called.
      *
      * @param name   GameObject name for this sprite
-     * @param x      left edge of the sprite
-     * @param y      top edge of the sprite
+     * @param centerX  the horizontal center of the sprite in world coordinates
+     * @param centerY  the vertical center of the sprite in world coordinates
      * @param width  width of the sprite
      * @param height height of the sprite
      */
-    public Sprite(String name, float x, float y, float width, float height) {
-        super(name, new RectF(x, y, x + width, y + height));
+    public Sprite(String name, float centerX, float centerY, float width, float height) {
+        super(name, new RectF(centerX - width / 2, centerY - height / 2,
+                centerX + width / 2, centerY + height / 2));
     }
 
     /**
@@ -56,14 +57,15 @@ public class Sprite extends GameObject {
      * the given image.
      *
      * @param name   GameObject name for this sprite
-     * @param x      left edge of the sprite
-     * @param y      top edge of the sprite
+     * @param centerX  the horizontal center of the sprite in world coordinates
+     * @param centerY  the vertical center of the sprite in world coordinates
      * @param width  width of the sprite
      * @param height height of the sprite
      * @param image_id   the ID of the image to display (eg {@code R.id.my_sprite})
      */
-    public Sprite(String name, float x, float y, float width, float height, int image_id) {
-        super(name, new RectF(x, y, x + width, y + height));
+    public Sprite(String name, float centerX, float centerY, float width, float height, int image_id) {
+        super(name, new RectF(centerX - width / 2, centerY - height / 2,
+                centerX + width / 2, centerY + height / 2));
         setDefaultImage(image_id);
     }
 

@@ -180,17 +180,90 @@ abstract public class GameObject {
     }
 
     /**
+     * Get the horizontal location of the center of this sprite.
+     *
+     * @return x value in world units
+     */
+    public float getX() {
+        return boundingRect.centerX();
+    }
+
+    /**
+     * Get the vertical location of the center of this sprite.
+     *
+     * @return y value in world units
+     */
+    public float getY() {
+        return boundingRect.centerY();
+    }
+
+    /**
+     * Set the sprite's center X and Y and its width and height all in one go.
+     *
+     * @param centerX horizontal coordinate of center of sprite in world units
+     * @param centerY vertical coordinate of center of sprite in world units
+     * @param width   width of sprite in world units
+     * @param height  height of sprite in world units
+     */
+    public void setXYWH(float centerX, float centerY, float width, float height) {
+        boundingRect.set(centerX - width / 2, centerY - height / 2,
+                centerX + width / 2, centerY + height / 2);
+    }
+
+    /**
      * Instantly move the game object so its center is at the given coordinates.
      *
      * @param x horizontal coordinate of the destination in world units
      * @param y vertical coordinate of the destination in world units
      */
-    public void setCenterXY(float x, float y) {
-        boundingRect.offset(x - boundingRect.centerX(), y - boundingRect.centerY());
+    public void setXY(float x, float y) {
+        setXYWH(x, y, boundingRect.width(), boundingRect.height());
     }
 
     /**
+     * Instantly move the game object so the center is at a given X location without
+     * changing the Y location.
+     *
+     * @param x horizontal coordinate of the destination in world units
+     */
+    public void setX(float x) {
+        setXYWH(x, boundingRect.centerY(), boundingRect.width(), boundingRect.height());
+    }
+
+    /**
+     * Instantly move the game object so the center is at a given Y location without
+     * changing the X location.
+     *
+     * @param y vertical coordinate of the destination in world units
+     */
+    public void setY(float y) {
+        setXYWH(boundingRect.centerX(), y, boundingRect.width(), boundingRect.height());
+    }
+
+    /**
+     * Set the width of the sprite without changing the location of its center.
+     *
+     * @param width new width in world units
+     */
+    public void setWidth(float width) {
+        setXYWH(boundingRect.centerX(), boundingRect.centerY(), width, boundingRect.height());
+    }
+
+    /**
+     * Set the height of the sprite without changing the location of its center.
+     *
+     * @param height new height in world units
+     */
+    public void setHeight(float height) {
+        setXYWH(boundingRect.centerX(), boundingRect.centerY(), boundingRect.width(), height);
+    }
+
+
+    /**
      * Instantly move the game object so its upper left is at the given coordinates.
+     *
+     * Normally we use the center coordinates of a sprite but occasionally it's handy to place
+     * one based on the upper left corner.
      *
      * @param x horizontal coordinate of the destination in world units
      * @param y vertical coordinate of the destination in world units
