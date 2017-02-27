@@ -3,6 +3,8 @@ package com.thekeirs.games.engine;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
+import java.util.List;
+
 /**
  * <h1>Abstract superclass to represent a game object in the game world</h1>
  * <p>
@@ -290,6 +292,21 @@ abstract public class GameObject {
      */
     final public boolean intersects(GameObject other) {
         return RectF.intersects(other.boundingRect, boundingRect);
+    }
+
+    /**
+     * Checks if this game object's bounding area intersects any of a given list of game objects.
+     *
+     * @param objects list of game objects to check against
+     * @return {@code null} if no intersection, otherwise the first game object it intersected
+     */
+    final public GameObject intersectsAny(List<? extends GameObject> objects) {
+        for (GameObject obj : objects) {
+            if (RectF.intersects(obj.boundingRect, boundingRect)) {
+                return obj;
+            }
+        }
+        return null;
     }
 
     /**

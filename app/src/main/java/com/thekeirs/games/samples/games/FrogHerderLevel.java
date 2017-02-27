@@ -92,7 +92,7 @@ public class FrogHerderLevel extends GameLevel {
         // "You Won" banner, display it.
         if (frogsOffPad == 0 && mYouWon == null) {
             // Cool, they're all on there.  Display the winning banner.
-            mYouWon = new Sprite("won", 100, 100, WIDTH - 100, HEIGHT - 100, R.raw.you_won);
+            mYouWon = new Sprite("won", WIDTH / 2, HEIGHT / 2, WIDTH - 100, HEIGHT - 100, R.raw.you_won);
             mManager.addObject(mYouWon);
         }
     }
