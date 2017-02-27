@@ -36,6 +36,7 @@ abstract public class GameObject {
     private long mTimeOnScreen;     // Time we've been on screen in millisec
     private long mMaxTimeOnScreen;  // Time after which we will request removal
     private boolean mRemovalRequested;  // Flag indicating this sprite should be removed
+    private int mZOrder;                // Order to draw this on the screen
 
     /**
      * Basic constructor.
@@ -344,5 +345,24 @@ abstract public class GameObject {
      */
     final public boolean removalRequested() {
         return mRemovalRequested;
+    }
+
+    /**
+     * Sets the order for this object to be drawn on the screen during each screen redraw loop.
+     * Higher numbers are drawn later so they appear to be "on top" of earlier items.
+     *
+     * @param zOrder the Z Order for this object. Can be any integer
+     */
+    final public void setZOrder(int zOrder) {
+        mZOrder = zOrder;
+
+        // If we're already being managed, make sure the manager knows about the update.
+        if (manager != null) {
+            manager.updateObjectZOrder(this);
+        }
+    }
+
+    final public int getZOrder() {
+        return mZOrder;
     }
 }

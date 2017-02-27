@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * <h1>The central class of the game engine, responsible for keeping track of all the game objects
@@ -31,7 +33,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
     private GameLevel mNextLevel;
     private float mWorldScreenWidth = 1600f, mWorldScreenHeight = 900f;
     private Resources mResources;
-
+    private SortedMap<Integer, List<GameObject>> mZOrder = new TreeMap<>();
     /**
      * An instance of the {@link MessageBus} that can be used to send messages, assuming we start using
      * that feature again.
@@ -72,6 +74,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
             mLevel.finish();
         }
         mObjects.clear();
+        mZOrder.clear();
         mScene = null;
 
         mLevel = mNextLevel;
@@ -101,6 +104,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
     public void addObject(GameObject obj) {
         obj.setManager(this);
         mObjects.put(obj.name, obj);
+        addObjectToZOrder(obj);
     }
 
     /**
@@ -301,8 +305,10 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         if (mScene != null) {
             mScene.draw(canvas);
         }
-        for (GameObject obj : mObjects.values()) {
-            obj.draw(canvas, xScale, yScale);
+        for (List<GameObject> layer : mZOrder.values()) {
+            for (GameObject obj : layer) {
+                obj.draw(canvas, xScale, yScale);
+            }
         }
     }
 
@@ -382,5 +388,32 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
      */
     public float getWorldScreenHeight() {
         return mWorldScreenHeight;
+    }
+
+    public void addObjectToZOrder(GameObject obj) {
+        int z = obj.getZOrder();
+        if (!mZOrder.containsKey(z)) {
+            mZOrder.put(z, new ArrayList<GameObject>());
+        }
+        mZOrder.get(z).add(obj);
+    }
+
+    public void updateObjectZOrder(GameObject obj) {
+        for (Map.Entry<Integer, List<GameObject>> entry : mZOrder.entrySet()) {
+            int z = entry.getKey();
+            List<GameObject> lst = entry.getValue();
+
+            if (lst.contains(obj)) {
+                if (z == obj.getZOrder()) {
+                    // We're already exactly where we need to be
+                    return;
+                } else {
+                    lst.remove(obj);
+                    break;
+                }
+            }
+        }
+        // Now that we're sure it's not somewhere wrong, add it the right place.
+        addObjectToZOrder(obj);
     }
 }

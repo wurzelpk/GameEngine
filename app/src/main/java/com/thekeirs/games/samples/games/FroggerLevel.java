@@ -53,6 +53,7 @@ public class FroggerLevel extends GameLevel {
 
         frog = new Sprite("player1", WIDTH / 2, HEIGHT - 100, 80, 80, R.drawable.frog);
         frog.setMotionSequence("hopping", 100, R.raw.plain_frog1, R.raw.plain_frog2, -1);
+        frog.setZOrder(1);
         mManager.addObject(frog);
 
         // Three logs going each direction; Logs are 320x80 and spaced 480 apart.
