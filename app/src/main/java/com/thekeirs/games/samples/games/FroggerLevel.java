@@ -1,9 +1,9 @@
 package com.thekeirs.games.samples.games;
 
+import com.thekeirs.games.engine.BackgroundImageScene;
 import com.thekeirs.games.engine.GameLevel;
 import com.thekeirs.games.engine.Rand;
 import com.thekeirs.games.engine.Scene;
-import com.thekeirs.games.engine.SolidColorScene;
 import com.thekeirs.games.engine.Sprite;
 import com.thekeirs.games.samples.R;
 
@@ -47,8 +47,8 @@ public class FroggerLevel extends GameLevel {
     public void setup() {
         mManager.setWorldScreenSize(WIDTH, HEIGHT);
 
-        Scene scene = new SolidColorScene("#20c0ff");
-        // Scene scene = new BackgroundImageScene(mManager, R.raw.my_background);
+        // Scene scene = new SolidColorScene("#20c0ff");
+        Scene scene = new BackgroundImageScene(mManager, R.raw.frogger_background);
         mManager.setScene(scene);
 
         frog = new Sprite("player1", WIDTH / 2, HEIGHT - 100, 80, 80, R.drawable.frog);

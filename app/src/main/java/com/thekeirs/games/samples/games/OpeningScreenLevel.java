@@ -47,7 +47,7 @@ public class OpeningScreenLevel extends GameLevel {
                         R.raw.button_castle_blaster) {
                     @Override
                     public void onTouch(float x, float y) {
-                        mManager.setLevel(new FrogHerderLevel());
+                        mManager.setLevel(new BallFlingerLevel());
                     }
                 }
         );
