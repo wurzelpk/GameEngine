@@ -487,7 +487,9 @@ abstract public class GameObject {
      * @param solid {@code true} to make it solid
      */
     public void setSolid(boolean solid) {
-        manager.setObjectSolidity(this, solid);
+        if (manager != null) {
+            manager.setObjectSolidity(this, solid);
+        }
         isSolid = solid;
     }
 

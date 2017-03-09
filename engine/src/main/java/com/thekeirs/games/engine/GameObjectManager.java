@@ -109,6 +109,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         obj.setManager(this);
         mObjects.put(obj.name, obj);
         addObjectToZOrder(obj);
+        setObjectSolidity(obj, obj.isSolid());
     }
 
     /**
