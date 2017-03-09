@@ -9,9 +9,11 @@ import android.view.SurfaceView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -34,6 +36,8 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
     private float mWorldScreenWidth = 1600f, mWorldScreenHeight = 900f;
     private Resources mResources;
     private SortedMap<Integer, List<GameObject>> mZOrder = new TreeMap<>();
+    private Set<GameObject> solidThings = new HashSet<>();
+
     /**
      * An instance of the {@link MessageBus} that can be used to send messages, assuming we start using
      * that feature again.
@@ -415,5 +419,13 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         }
         // Now that we're sure it's not somewhere wrong, add it the right place.
         addObjectToZOrder(obj);
+    }
+
+    public void setObjectSolidity(GameObject obj, boolean isSolid) {
+        if (isSolid) {
+            solidThings.add(obj);
+        } else {
+            solidThings.remove(obj);
+        }
     }
 }

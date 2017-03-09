@@ -28,6 +28,15 @@ abstract public class GameObject {
      */
     public RectF boundingRect;
 
+    private float dX, dY;
+    private boolean feelsGravity;
+    private boolean isBouncy;
+    private boolean isSolid;
+    private float ddX;
+    private float ddY = 60.0f;  // Pixels/sec/sec
+    private boolean autoDieOffscreen;
+    private static int anonymousCount;
+
     /**
      * To be useful, every game object must register with the game object manager
      */
@@ -41,11 +50,12 @@ abstract public class GameObject {
     /**
      * Basic constructor.
      *
-     * @param name   name of this sprite (used to look it up later)
+     * @param name   name of this sprite (used to look it up later).  If null or zero-length,
+     *               a name like "anon-000123" will be automatically assigned.
      * @param extent initial area on the screen this sprite will occupy, in world units
      */
     public GameObject(String name, RectF extent) {
-        this.name = name;
+        this.name = (name != null && name.length() > 0) ? name : String.format("anon-%06d", anonymousCount++);
         this.boundingRect = extent;
     }
 
@@ -71,8 +81,22 @@ abstract public class GameObject {
      *              Typically 16msec at 60Hz screen refresh.
      */
     public void update(int msec) {
+        float fracsec = msec / 1000.0f; // Velocities and gravity are in units of seconds
+
         mTimeOnScreen += msec;
         if (mMaxTimeOnScreen > 0 && mTimeOnScreen > mMaxTimeOnScreen) {
+            requestRemoval();
+        }
+
+        if (feelsGravity) {
+            dX += ddX * fracsec;
+            dY += ddY * fracsec;
+        }
+        if (dX != 0.0f || dY != 0.0f) {
+            moveBy(dX * fracsec, dY * fracsec);
+        }
+
+        if (autoDieOffscreen && isFullyOffScreen()) {
             requestRemoval();
         }
     }
@@ -362,7 +386,162 @@ abstract public class GameObject {
         }
     }
 
+    /**
+     * Gets the Z order of this object.  Higher numbers are drawn on top of lower numbers.
+     *
+     * @return Object's Z Order.
+     */
     final public int getZOrder() {
         return mZOrder;
+    }
+
+
+    /**
+     * Gets the horizontal velocity of this object
+     *
+     * @return velocity in pixels per second
+     */
+    public float getdX() {
+        return dX;
+    }
+
+    /**
+     * Sets the horizontal velocity of this object
+     *
+     * @param dX velocity in pixels per second
+     */
+    public void setdX(float dX) {
+        this.dX = dX;
+    }
+
+    /**
+     * Gets the vertical velocity of this object
+     *
+     * @return velocity in pixels per second
+     */
+    public float getdY() {
+        return dY;
+    }
+
+    /**
+     * Sets the vertical velocity of this object
+     *
+     * @param dY velocity in pixels per second
+     */
+    public void setdY(float dY) {
+        this.dY = dY;
+    }
+
+    /**
+     * Checks whether this object has been configured to be affected by gravity
+     *
+     * @return {@code true} if this object feels gravity
+     */
+    public boolean feelsGravity() {
+        return feelsGravity;
+    }
+
+    /**
+     * Sets whether this object is affected by gravity
+     *
+     * @param feelsGravity {@code true} to make this object respond to gravity
+     */
+    public void setFeelsGravity(boolean feelsGravity) {
+        this.feelsGravity = feelsGravity;
+    }
+
+    /**
+     * Sets whether objects that collide with this one bounce off or just stick.
+     *
+     * @return {@code true} if this object is bouncy
+     */
+    public boolean isBouncy() {
+        return isBouncy;
+    }
+
+    /**
+     * Checks whether this object is configured so that other colliding objects will bounce off
+     * instead of sticking.
+     *
+     * @param bouncy {@code true} to make it bouncy
+     */
+    public void setBouncy(boolean bouncy) {
+        isSolid = true;
+        isBouncy = bouncy;
+    }
+
+    /**
+     * Checks whether objects that collide with this one will be affected or will simply pass
+     * through.  See also isBouncy/setBouncy to configure what happens in a collision.
+     *
+     * @return {@code true} to make this object have an effect on colliding objects
+     */
+    public boolean isSolid() {
+        return isSolid;
+    }
+
+    /**
+     * Configures whether objects that collide with this one will be affected or will simply pass
+     * through.  See also isBouncy/setBouncy to configure what happens in a collision.
+     *
+     * @param solid {@code true} to make it solid
+     */
+    public void setSolid(boolean solid) {
+        manager.setObjectSolidity(this, solid);
+        isSolid = solid;
+    }
+
+    /**
+     * Get this object's horizontal gravitational acceleration
+     *
+     * @return acceleration in pixels/second/second
+     */
+    public float getAccelX() {
+        return ddX;
+    }
+
+    /**
+     * Set this object's horizontal gravitational acceleration.  Typical ranges are 1.0-10.0
+     *
+     * @param accelX acceleration in pixels/second/second
+     */
+    public void setAccelX(float accelX) {
+        this.ddX = ddX;
+    }
+
+    /**
+     * Get this object's vertical gravitational acceleration
+     *
+     * @return acceleration in pixels/second/second
+     */
+    public float getAccelY() {
+        return ddY;
+    }
+
+    /**
+     * Set this object's vertical gravitational acceleration.  Typical ranges are 1.0-10.0
+     *
+     * @param accelY acceleration in pixels/second/second
+     */
+    public void setAccelY(float accelY) {
+        this.ddY = ddY;
+    }
+
+    /**
+     * Checks if this object is configured to automatically be destroyed when fully offscreen.
+     *
+     * @return {@code true} if this object will die when no longer within screen boundaries
+     */
+    public Boolean getAutoDieOffscreen() {
+        return autoDieOffscreen;
+    }
+
+    /**
+     * Configures whether this object will automatically be destroyed when fully offscreen.
+     *
+     * @param autoDieOffscreen {@code true} to make the object die
+     */
+    public void setAutoDieOffscreen(Boolean autoDieOffscreen) {
+        this.autoDieOffscreen = autoDieOffscreen;
     }
 }
