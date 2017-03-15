@@ -93,11 +93,41 @@ abstract public class GameObject {
             dY += ddY * fracsec;
         }
         if (dX != 0.0f || dY != 0.0f) {
-            moveBy(dX * fracsec, dY * fracsec);
+            PositionUpdate posup = new PositionUpdate(
+                    this.getX(), this.getY(),
+                    this.getX() + dX * fracsec, this.getY() + dY * fracsec);
+
+            interactWithSolids(posup);
+            setXY(posup.newx, posup.newy);
         }
 
         if (autoDieOffscreen && isFullyOffScreen()) {
             requestRemoval();
+        }
+    }
+
+    protected class PositionUpdate {
+        public float oldx, oldy;
+        public float newx, newy;
+
+        public PositionUpdate(float ox, float oy, float nx, float ny) {
+            oldx = ox;
+            oldy = oy;
+            newx = nx;
+            newy = ny;
+        }
+    }
+
+    private void interactWithSolids(PositionUpdate posup) {
+        for (GameObject obj : manager.getSolidObjects()) {
+            if (!intersects(obj)) {
+                continue;
+            }
+            // If we're moving downwards and our center is above the top of the solid object
+            if (dY > 0 && posup.oldy < obj.boundingRect.top) {
+                posup.newy = obj.boundingRect.top - boundingRect.height() / 2.0f;
+                dY = (obj.isBouncy) ? -dY : 0;
+            }
         }
     }
 

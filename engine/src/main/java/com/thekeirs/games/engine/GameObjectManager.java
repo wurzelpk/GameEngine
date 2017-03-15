@@ -330,7 +330,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
 
         // Log.d(TAG, "update");
         for (GameObject obj : mObjects.values()) {
-            obj.update(millis);   // TODO: For now, cheating and assuming 60fps
+            obj.update(millis);
         }
         mLevel.update(millis);
 
@@ -341,6 +341,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         while (it.hasNext()) {
             GameObject obj = it.next();
             if (obj.removalRequested()) {
+                prepareToRemove(obj);
                 it.remove();
             }
         }
@@ -403,22 +404,20 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         mZOrder.get(z).add(obj);
     }
 
-    public void updateObjectZOrder(GameObject obj) {
+    public void removeObjectFromZOrder(GameObject obj) {
         for (Map.Entry<Integer, List<GameObject>> entry : mZOrder.entrySet()) {
             int z = entry.getKey();
             List<GameObject> lst = entry.getValue();
 
             if (lst.contains(obj)) {
-                if (z == obj.getZOrder()) {
-                    // We're already exactly where we need to be
-                    return;
-                } else {
-                    lst.remove(obj);
-                    break;
-                }
+                lst.remove(obj);
+                break;
             }
         }
-        // Now that we're sure it's not somewhere wrong, add it the right place.
+    }
+
+    public void updateObjectZOrder(GameObject obj) {
+        removeObjectFromZOrder(obj);
         addObjectToZOrder(obj);
     }
 
@@ -428,5 +427,14 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         } else {
             solidThings.remove(obj);
         }
+    }
+
+    public void prepareToRemove(GameObject obj) {
+        removeObjectFromZOrder(obj);
+        solidThings.remove(obj);
+    }
+
+    public Set<GameObject> getSolidObjects() {
+        return solidThings;
     }
 }
