@@ -6,6 +6,8 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.InputDevice;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -97,6 +99,31 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         });
     }
 
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if ((event.getSource() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) {
+            mGameViewThread.queueEvent(new UIEvent(UIEventType.ButtonUp, event.getKeyCode()));
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((event.getSource() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) {
+            mGameViewThread.queueEvent(new UIEvent(UIEventType.ButtonDown, event.getKeyCode()));
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public boolean onGenericMotionEvent(MotionEvent event) {
+        if ((event.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
+            mGameViewThread.queueEvent(new UIEvent(UIEventType.Joystick, event));
+            return true;
+        }
+        return super.onGenericMotionEvent(event);
+    }
+
+
     public void setRedrawService(IRedrawService rs) {
         mRedrawService = rs;
     }
@@ -149,13 +176,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public enum UIEventType {
-        Down, ShowPress, SingleTapUp, Scroll, LongPress, Fling
+        Down, ShowPress, SingleTapUp, Scroll, LongPress, Fling, Joystick, ButtonDown, ButtonUp,
     }
 
     public class UIEvent {
         UIEvent(UIEventType type, MotionEvent event1) {
             this.type = type;
             this.event1 = event1;
+        }
+
+        UIEvent(UIEventType type, int keyCode) {
+            this.type = type;
+            this.keyCode = keyCode;
         }
 
         UIEvent(UIEventType type, MotionEvent event1, MotionEvent event2, float dx, float dy) {
@@ -169,6 +201,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         UIEventType type;
         public MotionEvent event1, event2;
         public float dx, dy;        // Holds Velocity for flings, distance for scrolls
+        int keyCode;
     }
 }
 

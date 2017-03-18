@@ -21,6 +21,7 @@ public class FountainLevel extends GameLevel {
     private List<Sprite> platforms = new ArrayList<>();
     private final int[][] PLAT_COORDS = {{300, 200}, {500, 800}, {1000, 400}, {1300, 600}};
     Sprite floor;
+    Sprite frog;
 
     public FountainLevel() {
         super();
@@ -44,6 +45,9 @@ public class FountainLevel extends GameLevel {
             mManager.addObject(p);
         }
 
+        frog = new Sprite("frog", WIDTH / 4, HEIGHT / 4, 60, 60, R.drawable.frog);
+        mManager.addObject(frog);
+
         floor = new Sprite("floor", WIDTH / 2, HEIGHT - 5, WIDTH, 10, R.raw.button_castle_blaster);
         floor.setSolid(true);
         mManager.addObject(floor);
@@ -62,5 +66,17 @@ public class FountainLevel extends GameLevel {
             ball.setdY(Rand.between(-300, -100));
             mManager.addObject(ball);
         }
+        frog.setdX(mManager.getRightStickX() * 300);
+        frog.setdY(mManager.getRightStickY() * 300);
+    }
+
+    @Override
+    public void onButtonDown(int keyCode) {
+        Sprite ball = new Sprite("", WIDTH / 2, HEIGHT / 2, 60, 60, R.raw.prince_headshot);
+        ball.setFeelsGravity(true);
+        ball.setAutoDieOffscreen(true);
+        ball.setdX(Rand.between(-150, 150));
+        ball.setdY(Rand.between(-300, -100));
+        mManager.addObject(ball);
     }
 }

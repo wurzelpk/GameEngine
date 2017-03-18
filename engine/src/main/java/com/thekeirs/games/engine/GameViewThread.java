@@ -62,11 +62,13 @@ public class GameViewThread extends Thread {
                 GameView.UIEvent e;
 
                 while ((e = mEvents.poll()) != null) {
-                    e.event1.setLocation(e.event1.getX() * mXFactor, e.event1.getY() * mYFactor);
-                    if (e.event2 != null) {
-                        e.event2.setLocation(e.event2.getX() * mXFactor, e.event2.getY() * mYFactor);
-                        e.dx *= mXFactor;
-                        e.dy *= mYFactor;
+                    if (e.event1 != null && e.type != GameView.UIEventType.Joystick) {
+                        e.event1.setLocation(e.event1.getX() * mXFactor, e.event1.getY() * mYFactor);
+                        if (e.event2 != null) {
+                            e.event2.setLocation(e.event2.getX() * mXFactor, e.event2.getY() * mYFactor);
+                            e.dx *= mXFactor;
+                            e.dy *= mYFactor;
+                        }
                     }
                     mGameLogic.onMotionEvent(e);
                 }

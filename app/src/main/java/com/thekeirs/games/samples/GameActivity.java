@@ -2,6 +2,9 @@ package com.thekeirs.games.samples;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 
 import com.thekeirs.games.engine.Audio;
 import com.thekeirs.games.engine.GameObjectManager;
@@ -11,6 +14,7 @@ import com.thekeirs.games.engine.MessageBus;
 import com.thekeirs.games.samples.games.OpeningScreenLevel;
 
 public class GameActivity extends AppCompatActivity {
+    final String TAG = "GameActivity";
     private MessageBus mBus;
     private GameView mGameView;
     private GameObjectManager mObjectManager;
@@ -30,6 +34,8 @@ public class GameActivity extends AppCompatActivity {
         mGameView = (GameView) findViewById(R.id.gameview);
         mGameView.setRedrawService(mObjectManager);
         mGameView.setGameLogicService(mObjectManager);
+        mGameView.setFocusable(true);
+        mGameView.requestFocus();
     }
 
     @Override
@@ -44,5 +50,20 @@ public class GameActivity extends AppCompatActivity {
         super.onPause();
         mGameView.onPause();
         Audio.onPause();
+    }
+
+    @Override
+    public boolean dispatchGenericMotionEvent(MotionEvent ev) {
+        Log.d(TAG, "Motion: ");
+        return mGameView.onGenericMotionEvent(ev);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "Event: " + event.toString());
+        return (event.getAction() == KeyEvent.ACTION_DOWN)
+                ? mGameView.onKeyDown(event.getKeyCode(), event)
+                : mGameView.onKeyUp(event.getKeyCode(), event);
+
     }
 }

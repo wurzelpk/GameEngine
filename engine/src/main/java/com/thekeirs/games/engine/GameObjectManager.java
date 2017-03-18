@@ -37,6 +37,8 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
     private Resources mResources;
     private SortedMap<Integer, List<GameObject>> mZOrder = new TreeMap<>();
     private Set<GameObject> solidThings = new HashSet<>();
+    private float rightStickX, rightStickY;
+    private float leftStickX, leftStickY;
 
     /**
      * An instance of the {@link MessageBus} that can be used to send messages, assuming we start using
@@ -277,8 +279,8 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
     @Override
     public void onMotionEvent(GameView.UIEvent e) {
         // We receive the event with coordinates normalized 0.0-1.0f.  Scale to our world coords.
-        float x = e.event1.getX() * mWorldScreenWidth;
-        float y = e.event1.getY() * mWorldScreenHeight;
+        float x = (e.event1 != null) ? e.event1.getX() * mWorldScreenWidth : 0.0f;
+        float y = (e.event1 != null) ? e.event1.getY() * mWorldScreenHeight : 0.0f;
         switch (e.type) {
             case Down:
                 Log.d(TAG, "Event ACTION_DOWN at " + x + "," + y);
@@ -290,6 +292,24 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
             case Scroll:
                 deliverScroll(x, y, e.dx * mWorldScreenWidth, e.dy * mWorldScreenHeight,
                         e.event2.getAction() == MotionEvent.ACTION_UP);
+                break;
+            case ButtonDown:
+                if (mLevel != null) {
+                    mLevel.onButtonDown(e.keyCode);
+                }
+                break;
+            case ButtonUp:
+                if (mLevel != null) {
+                    mLevel.onButtonUp(e.keyCode);
+                }
+                break;
+            case Joystick:
+                leftStickX = e.event1.getAxisValue(MotionEvent.AXIS_X);
+                leftStickY = e.event1.getAxisValue(MotionEvent.AXIS_Y);
+                rightStickX = e.event1.getAxisValue(MotionEvent.AXIS_Z);
+                rightStickY = e.event1.getAxisValue(MotionEvent.AXIS_RZ);
+                Log.d(TAG, "sticks: " + leftStickX + " " + leftStickY + " " + rightStickX + " " + rightStickY);
+                Log.d(TAG, "count: " + e.event1.getHistorySize());
                 break;
             default:
                 break;
@@ -436,5 +456,21 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
 
     public Set<GameObject> getSolidObjects() {
         return solidThings;
+    }
+
+    public float getLeftStickX() {
+        return leftStickX;
+    }
+
+    public float getLeftStickY() {
+        return leftStickY;
+    }
+
+    public float getRightStickX() {
+        return rightStickX;
+    }
+
+    public float getRightStickY() {
+        return rightStickY;
     }
 }

@@ -142,6 +142,13 @@ abstract public class GameLevel {
     public void onUnclaimedScroll(float x, float y, float dx, float dy, boolean finished) {
     }
 
+    public void onButtonDown(int keyCode) {
+    }
+
+    public void onButtonUp(int keyCode) {
+
+    }
+
     /**
      * Called by the game object manager when this level is about to be destroyed before starting
      * a new level.
