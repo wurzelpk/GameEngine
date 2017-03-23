@@ -52,6 +52,17 @@ public class OpeningScreenLevel extends GameLevel {
                 }
         );
 
+        mManager.addObject(
+                new Sprite("zombie_button",
+                        800, 400, 800, 75,
+                        R.raw.button_zombie) {
+                    @Override
+                    public void onTouch(float x, float y) {
+                        mManager.setLevel(new ZombieLevel());
+                    }
+                }
+        );
+
     }
 
     public void finish() {
