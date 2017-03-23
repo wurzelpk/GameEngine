@@ -1,6 +1,10 @@
 package com.thekeirs.games.samples.games;
 
+import android.view.KeyEvent;
+
+import com.thekeirs.games.engine.Audio;
 import com.thekeirs.games.engine.GameLevel;
+import com.thekeirs.games.engine.GameObject;
 import com.thekeirs.games.engine.Rand;
 import com.thekeirs.games.engine.Scene;
 import com.thekeirs.games.engine.SolidColorScene;
@@ -59,12 +63,20 @@ public class FountainLevel extends GameLevel {
 
 
         if (Rand.onceEvery(1.0f)) {
-            Sprite ball = new Sprite("", WIDTH / 2, HEIGHT / 2, 40, 40, R.raw.pink_ball);
+            Sprite ball = new Sprite("", WIDTH / 2, HEIGHT / 2, 40, 40, R.raw.pink_ball) {
+                @Override
+                public void onCollision(GameObject other) {
+                    if (other != floor) {
+                        Audio.play(R.raw.frog_croak);
+                    }
+                }
+            };
             ball.setFeelsGravity(true);
             ball.setAutoDieOffscreen(true);
             ball.setdX(Rand.between(-150, 150));
             ball.setdY(Rand.between(-300, -100));
             mManager.addObject(ball);
+            Audio.play(R.raw.bloop);
         }
         frog.setdX(mManager.getRightStickX() * 300);
         frog.setdY(mManager.getRightStickY() * 300);
@@ -72,11 +84,19 @@ public class FountainLevel extends GameLevel {
 
     @Override
     public void onButtonDown(int keyCode) {
-        Sprite ball = new Sprite("", WIDTH / 2, HEIGHT / 2, 60, 60, R.raw.prince_headshot);
-        ball.setFeelsGravity(true);
-        ball.setAutoDieOffscreen(true);
-        ball.setdX(Rand.between(-150, 150));
-        ball.setdY(Rand.between(-300, -100));
-        mManager.addObject(ball);
+        Sprite ball = null;
+
+        if (keyCode == KeyEvent.KEYCODE_BUTTON_R1) {
+            ball = new Sprite("", WIDTH / 2, HEIGHT / 2, 60, 60, R.raw.prince_headshot);
+        } else if (keyCode == KeyEvent.KEYCODE_BUTTON_A) {
+            ball = new Sprite("", WIDTH / 2, HEIGHT / 2, 60, 60, R.raw.frogger_car);
+        }
+        if (ball != null) {
+            ball.setFeelsGravity(true);
+            ball.setAutoDieOffscreen(true);
+            ball.setdX(Rand.between(-150, 150));
+            ball.setdY(Rand.between(-300, -100));
+            mManager.addObject(ball);
+        }
     }
 }

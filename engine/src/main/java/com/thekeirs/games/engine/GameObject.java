@@ -127,6 +127,7 @@ abstract public class GameObject {
             if (dY > 0 && posup.oldy < obj.boundingRect.top) {
                 posup.newy = obj.boundingRect.top - boundingRect.height() / 2.0f;
                 dY = (obj.isBouncy) ? -dY : 0;
+                onCollision(obj);
             }
         }
     }
@@ -575,5 +576,13 @@ abstract public class GameObject {
      */
     public void setAutoDieOffscreen(Boolean autoDieOffscreen) {
         this.autoDieOffscreen = autoDieOffscreen;
+    }
+
+    /**
+     * Called when this objects collides with another one in the physics engine
+     *
+     * @param other The other object it collided with
+     */
+    public void onCollision(GameObject other) {
     }
 }
