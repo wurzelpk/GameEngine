@@ -108,10 +108,25 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
      * @param obj a {@link GameObject} or derived class to manage
      */
     public void addObject(GameObject obj) {
-        obj.setManager(this);
-        mObjects.put(obj.name, obj);
-        addObjectToZOrder(obj);
-        setObjectSolidity(obj, obj.isSolid());
+        if (mObjects.containsKey(obj)) {
+            hint("Object added multiple times: " + obj.name,
+                    "You added the same object to the game manager more than once.  This is " +
+                            "probably not what you meant to do.  Are you calling addObject() " +
+                            "from update() rather than setup()?");
+        } else {
+            GameObject older = getObjectByName(obj.name);
+            if (older != null) {
+                hint("Object with same name: " + obj.name,
+                        "You created an object with the same name as an existing object.  " +
+                                "This will replace the existing object.  If this was not what you " +
+                                "meant to do, give the new object a unique name.");
+                prepareToRemove(older);
+            }
+            obj.setManager(this);
+            mObjects.put(obj.name, obj);
+            addObjectToZOrder(obj);
+            setObjectSolidity(obj, obj.isSolid());
+        }
     }
 
     /**
@@ -472,5 +487,9 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
 
     public float getRightStickY() {
         return rightStickY;
+    }
+
+    public void hint(String summary, String description) {
+        // TODO: Make some kind of pop-up to help game engine user see hints
     }
 }

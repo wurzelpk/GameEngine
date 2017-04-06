@@ -256,6 +256,24 @@ abstract public class GameObject {
     }
 
     /**
+     * Get the width of the bounding box for this sprite.
+     *
+     * @return width in world units
+     */
+    public float getWidth() {
+        return boundingRect.width();
+    }
+
+    /**
+     * Get the height of the bounding box for this sprite.
+     *
+     * @return height in world units
+     */
+    public float getHeight() {
+        return boundingRect.height();
+    }
+
+    /**
      * Set the sprite's center X and Y and its width and height all in one go.
      *
      * @param centerX horizontal coordinate of center of sprite in world units

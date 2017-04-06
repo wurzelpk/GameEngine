@@ -87,9 +87,18 @@ public class Sprite extends GameObject {
         mMotionSequences.put(motionStateName, new MotionSequence(frameDuration, ids));
     }
 
+
     public void setMotionState(String motionState) {
-        mMotionState = motionState;
-        timeInThisMotionState = 0;
+        setMotionState(motionState, false);
+    }
+
+    public void setMotionState(String motionState, boolean restartIfSame) {
+        if (mMotionState != motionState) {
+            mMotionState = motionState;
+            timeInThisMotionState = 0;
+        } else if (restartIfSame) {
+            timeInThisMotionState = 0;
+        }
     }
 
     /**
