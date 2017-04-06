@@ -557,7 +557,7 @@ abstract public class GameObject {
      * @param accelX acceleration in pixels/second/second
      */
     public void setAccelX(float accelX) {
-        this.ddX = ddX;
+        this.ddX = accelX;
     }
 
     /**
@@ -575,7 +575,7 @@ abstract public class GameObject {
      * @param accelY acceleration in pixels/second/second
      */
     public void setAccelY(float accelY) {
-        this.ddY = ddY;
+        this.ddY = accelY;
     }
 
     /**
