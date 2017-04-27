@@ -60,6 +60,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
         mObjects = new HashMap<>();
         mBus = mbus;
         mBus.addClient(this);
+        Images.setDefaultImage(R.drawable.default_image);
     }
 
     /**
