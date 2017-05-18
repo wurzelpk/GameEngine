@@ -39,6 +39,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
     private Set<GameObject> solidThings = new HashSet<>();
     private float rightStickX, rightStickY;
     private float leftStickX, leftStickY;
+    private Object mGameState;
 
     /**
      * An instance of the {@link MessageBus} that can be used to send messages, assuming we start using
@@ -492,5 +493,13 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
 
     public void hint(String summary, String description) {
         // TODO: Make some kind of pop-up to help game engine user see hints
+    }
+
+    public Object getGameState() {
+        return mGameState;
+    }
+
+    public void setGameState(Object obj) {
+        mGameState = obj;
     }
 }
