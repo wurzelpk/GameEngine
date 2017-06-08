@@ -2,6 +2,7 @@ package com.thekeirs.games.engine;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.util.Log;
 
 import java.util.List;
 
@@ -27,11 +28,13 @@ abstract public class GameObject {
      * in world coordinates.
      */
     public RectF boundingRect;
+    public CollisionShape complexShape;
 
     private float dX, dY;
     private boolean feelsGravity;
     private boolean isBouncy;
     private boolean isSolid;
+    private boolean isComplex;
     private float ddX;
     private float ddY = 60.0f;  // Pixels/sec/sec
     private boolean autoDieOffscreen;
@@ -57,6 +60,7 @@ abstract public class GameObject {
     public GameObject(String name, RectF extent) {
         this.name = (name != null && name.length() > 0) ? name : String.format("anon-%06d", anonymousCount++);
         this.boundingRect = extent;
+        this.isComplex = false;
     }
 
     /**
@@ -118,16 +122,46 @@ abstract public class GameObject {
         }
     }
 
+    public boolean forceCollisionDetection(float x, float y){
+        PositionUpdate posup = new PositionUpdate(
+                this.getX(), this.getY(),
+                this.getX() + x, this.getY() + y);
+
+        interactWithSolids(posup);
+        return true;
+    }
+
     private void interactWithSolids(PositionUpdate posup) {
         for (GameObject obj : manager.getSolidObjects()) {
+            if (this == obj){
+                continue;
+            }
             if (!intersects(obj)) {
                 continue;
             }
-            // If we're moving downwards and our center is above the top of the solid object
-            if (dY > 0 && posup.oldy < obj.boundingRect.top) {
-                posup.newy = obj.boundingRect.top - boundingRect.height() / 2.0f;
-                dY = (obj.isBouncy) ? -dY : 0;
-                onCollision(obj);
+            if (isComplex() || obj.isComplex()){
+//                Log.d("SAT", "Beginning complex check...");
+                // If either of these objects doesn't have a complex shape,
+                // generate it from the boundingRect
+                if (complexShape == null){
+                    complexShape = new CollisionShape(boundingRect);
+                }
+                if (obj.complexShape == null){
+                    obj.complexShape = new CollisionShape(obj.boundingRect);
+                }
+
+                if (complexShape.collideWith(obj.complexShape, (double) this.getX(), (double) this.getY(), (double) obj.getX(), (double) obj.getY())){
+                    Log.d("SAT", "Colliding!" + this.name + " " + obj.name);
+                    onCollision(obj);
+                }
+            }
+            else {
+                // If we're moving downwards and our center is above the top of the solid object
+                if (dY > 0 && posup.oldy < obj.boundingRect.top) {
+                    posup.newy = obj.boundingRect.top - boundingRect.height() / 2.0f;
+                    dY = (obj.isBouncy) ? -dY : 0;
+                    onCollision(obj);
+                }
             }
         }
     }
@@ -602,5 +636,16 @@ abstract public class GameObject {
      * @param other The other object it collided with
      */
     public void onCollision(GameObject other) {
+    }
+
+    public boolean isComplex(){ return isComplex; }
+
+    public void setIsComplex(boolean complex){
+        isComplex = complex;
+    }
+
+    public void setComplexShape(CollisionVertex... verts){
+        complexShape = new CollisionShape(verts);
+        isComplex = true;
     }
 }
