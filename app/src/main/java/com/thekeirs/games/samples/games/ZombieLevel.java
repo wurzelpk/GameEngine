@@ -2,7 +2,9 @@ package com.thekeirs.games.samples.games;
 
 import com.thekeirs.games.engine.Audio;
 import com.thekeirs.games.engine.BackgroundImageScene;
+import com.thekeirs.games.engine.CollisionVertex;
 import com.thekeirs.games.engine.GameLevel;
+import com.thekeirs.games.engine.GameObject;
 import com.thekeirs.games.engine.Rand;
 import com.thekeirs.games.engine.Sprite;
 import com.thekeirs.games.engine.Text;
@@ -16,6 +18,8 @@ import static java.lang.Math.max;
  * Created by Holden Matheson on 1/6/17.
  *
  * Zombie brain hunt - demonstrates the usage of the Text object, among other things.
+ *
+ * button template: https://dabuttonfactory.com/#t=I+understand&f=Caviar-Bold-Italic&ts=27&tc=000&tshs=1&tshc=000&hp=20&vp=8&c=5&bgt=gradient&bgc=f00&ebgc=900&bs=1&bc=569&shs=4&shc=444&sho=se
  */
 
 public class ZombieLevel extends GameLevel {
@@ -31,6 +35,7 @@ public class ZombieLevel extends GameLevel {
     private float speed = 6;
     private Sprite zombie = null;
     private Sprite brain = null;
+    private Sprite triangle = null;
     private Text scoreText = null;
     private boolean started = false;
 
@@ -42,12 +47,28 @@ public class ZombieLevel extends GameLevel {
         mManager.setWorldScreenSize(1600, 900);
         // mManager.setScene(new SolidColorScene("#5588aa"));
         mManager.setScene(new BackgroundImageScene(mManager, R.raw.zombiebackground));
+        triangle = new Sprite("death", 800, 500, 400, 400, R.raw.triangle);
+        triangle.setSolid(true);
+        triangle.setComplexShape(
+                new CollisionVertex(0, -120),
+                new CollisionVertex(120, 120),
+                new CollisionVertex(-120, 120));
+
+        mManager.addObject(triangle);
 
         mManager.addObject(
                 new Sprite("brain", Rand.between(100,1500), Rand.between(100, 800), 84, 60, R.raw.brain)
         );
         mManager.addObject(
-                new Sprite("zombie", 400, 100, 200, 200, R.raw.zombie)
+                new Sprite("zombie", 400, 100, 200, 200, R.raw.zombie){
+                    @Override
+                    public void onCollision(GameObject other) {
+                        super.onCollision(other);
+                        if (other.name.equals("death")) {
+                            score -= 100;
+                        }
+                    }
+                }
         );
         mManager.addObject(
                 new Text("score", "", 100, 100, 50, 50)
@@ -77,6 +98,12 @@ public class ZombieLevel extends GameLevel {
         scoreText = (Text) mManager.getObjectByName("score");
         scoreText.setTransparency(200);
         scoreText.setHexColor("BB0000");
+        zombie.setComplexShape(
+                new CollisionVertex(1, 4),
+                new CollisionVertex(1, 0),
+                new CollisionVertex(-5, 2));
+        zombie.setSolid(true);
+        brain.setSolid(true);
     }
 
     @Override
@@ -87,6 +114,7 @@ public class ZombieLevel extends GameLevel {
             int scoreTint = max(16, min((170 + (score / 10)), 255));
             scoreText.setHexColor(Integer.toHexString(scoreTint) + "0000");
 
+            zombie.forceCollisionDetection(this.speed, this.direction);
             zombie.hop(this.speed, this.direction);
             zombie.setRotation((float) this.direction);
             if (zombie.isFullyOffScreen()) {
@@ -97,7 +125,7 @@ public class ZombieLevel extends GameLevel {
             if (brain.isInside(zombie)) {
                 // http://soundbible.com/976-Eating.html
                 Audio.play(R.raw.eating);
-                if (speed < 40) {
+                if (speed < 20) {
                     speed += 4;
                 }
                 score += 100;
