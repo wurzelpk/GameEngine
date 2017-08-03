@@ -82,6 +82,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
             mLevel.finish();
         }
         mObjects.clear();
+        solidThings.clear();
         mZOrder.clear();
         mScene = null;
 
