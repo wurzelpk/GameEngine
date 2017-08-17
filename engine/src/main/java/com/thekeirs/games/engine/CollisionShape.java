@@ -9,7 +9,7 @@ import android.graphics.RectF;
  */
 
 public class CollisionShape {
-    private CollisionVertex[] verticies;
+    public CollisionVertex[] verticies;
     private CollisionVector[] edges;
     private CollisionVector[] normals;
     private CollisionVector[] axes;

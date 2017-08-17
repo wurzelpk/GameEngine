@@ -3,6 +3,8 @@ package com.thekeirs.games.engine;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 
 import java.util.ArrayList;
@@ -184,8 +186,35 @@ public class Sprite extends GameObject {
         mMatrix.postTranslate(boundingRect.centerX() * xScale, boundingRect.centerY() * yScale);
 
         // RectF screenRect = new RectF(boundingRect.left * xScale, boundingRect.top * yScale, boundingRect.right * xScale, boundingRect.bottom * yScale);
-
+        if (this.debugMode) {
+            c.drawRect(boundingRect.left * xScale, boundingRect.top * yScale, boundingRect.right * xScale, boundingRect.bottom * yScale, new Paint());
+        }
         c.drawBitmap(image, mMatrix, null);
+
+        if (this.debugMode) {
+            Paint red = new Paint();
+            red.setARGB(200, 255, 0, 0);
+            red.setStrokeWidth((float) 5.0);
+            Paint purple = new Paint();
+            purple.setARGB(200, 200, 0, 200);
+            purple.setStrokeWidth((float) 3.0);
+            purple.setStyle(Paint.Style.STROKE);
+            if (this.complexShape != null) {
+                Path collisionPath = new Path();
+                collisionPath.reset();
+                collisionPath.moveTo((float) (this.getX() + this.complexShape.verticies[0].x) * xScale,
+                        (float) (this.getY() + this.complexShape.verticies[0].y) * yScale);
+                for (int i = 1; i < this.complexShape.verticies.length; i++) {
+                    collisionPath.lineTo((float) (this.getX() + this.complexShape.verticies[i].x) * xScale,
+                            (float) (this.getY() + this.complexShape.verticies[i].y) * yScale);
+                }
+                collisionPath.close();
+                c.drawPath(collisionPath, purple);
+                for (CollisionVertex vert : this.complexShape.verticies) {
+                    c.drawPoint((float) (this.getX() + vert.x) * xScale, (float) (this.getY() + vert.y) * yScale, red);
+                }
+            }
+        }
     }
 
     private class MotionSequence {

@@ -40,6 +40,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
     private float rightStickX, rightStickY;
     private float leftStickX, leftStickY;
     private Object mGameState;
+    private boolean debugMode = false;
 
     /**
      * An instance of the {@link MessageBus} that can be used to send messages, assuming we start using
@@ -129,6 +130,7 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
             mObjects.put(obj.name, obj);
             addObjectToZOrder(obj);
             setObjectSolidity(obj, obj.isSolid());
+            obj.setDebugMode(this.debugMode || obj.debugMode);
         }
     }
 
@@ -502,5 +504,9 @@ public final class GameObjectManager implements IMessageClient, GameView.IRedraw
 
     public void setGameState(Object obj) {
         mGameState = obj;
+    }
+
+    public void setDebugMode(boolean bool){
+        this.debugMode = bool;
     }
 }

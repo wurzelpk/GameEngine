@@ -39,6 +39,7 @@ abstract public class GameObject {
     private float ddY = 60.0f;  // Pixels/sec/sec
     private boolean autoDieOffscreen;
     private static int anonymousCount;
+    protected boolean debugMode = false;
 
     /**
      * To be useful, every game object must register with the game object manager
@@ -140,7 +141,7 @@ abstract public class GameObject {
                 continue;
             }
             if (isComplex() || obj.isComplex()){
-//                Log.d("SAT", "Beginning complex check...");
+                Log.d("SAT", "Beginning complex check..." + obj.name + this.name);
                 // If either of these objects doesn't have a complex shape,
                 // generate it from the boundingRect
                 if (complexShape == null){
@@ -368,6 +369,9 @@ abstract public class GameObject {
         setXYWH(boundingRect.centerX(), boundingRect.centerY(), boundingRect.width(), height);
     }
 
+    public void setDebugMode(boolean bool) {
+        this.debugMode = bool;
+    }
 
     /**
      * Instantly move the game object so its upper left is at the given coordinates.
